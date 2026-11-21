@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FF GLORY - Admin Login</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body style="justify-content:center; align-items:center;">
+
+    <div class="card" style="width: 90%; max-width: 400px; margin-top: 50px;">
+        <h2 style="text-align:center; margin-bottom:20px; color:var(--gold);">Admin Panel</h2>
+        <form id="adminLoginForm">
+            <div class="input-group">
+                <label>Admin Email</label>
+                <input type="email" id="adminEmail" placeholder="admin@ffglory.com" required>
+            </div>
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" id="adminPassword" required>
+            </div>
+            <button type="submit" class="btn btn-gold">Login to Dashboard</button>
+            <p id="error-msg" style="color: red; font-size: 0.8rem; text-align: center; margin-top: 10px;"></p>
+        </form>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/admin.js"></script>
+    <script>
+        document.getElementById('adminLoginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('adminEmail').value;
+            const pass = document.getElementById('adminPassword').value;
+            
+            auth.signInWithEmailAndPassword(email, pass)
+                .then(() => window.location.href = 'dashboard.html')
+                .catch(err => document.getElementById('error-msg').innerText = "Invalid Admin Credentials!");
+        });
+    </script>
+</body>
+</html>
