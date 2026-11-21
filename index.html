@@ -6,19 +6,485 @@
     <title>FF GLORY – Free Fire Auto Glory System</title>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css"> <!-- কমন CSS -->
     <style>
-        /* এখানে আপনার আগের দেওয়া index.html এর সব CSS পেস্ট করে দিন, তবে নিচের অংশটুকু ইমেজের জন্য পরিবর্তন করুন */
-        /* ... (আপনার আগের CSS কোড এখানে থাকবে) ... */
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+    :root {
+        --bg:      #07090f;
+        --bg2:     #0d1120;
+        --card:    #111827;
+        --border:  rgba(99,102,241,0.18);
+        --indigo:  #6366f1;
+        --violet:  #8b5cf6;
+        --gold:    #f59e0b;
+        --cyan:    #06b6d4;
+        --text:    #e2e8f0;
+        --muted:   #64748b;
+        --dim:     #1e293b;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        overflow-x: hidden;
+    }
+
+    /* ─── FLOATING BUBBLES BACKGROUND ─── */
+    .bubbles-bg {
+        position: fixed; inset: 0; z-index: 0; pointer-events: none;
+        overflow: hidden;
+        background: radial-gradient(ellipse at 20% 50%, rgba(30,58,138,0.18) 0%, transparent 60%),
+                    radial-gradient(ellipse at 80% 20%, rgba(37,99,235,0.12) 0%, transparent 50%),
+                    radial-gradient(ellipse at 60% 80%, rgba(29,78,216,0.10) 0%, transparent 50%);
+    }
+    .bubble {
+        position: absolute;
+        border-radius: 50%;
+        animation: floatUp linear infinite;
+        pointer-events: none;
+    }
+    @keyframes floatUp {
+        0%   { transform: translateY(100vh) scale(0); opacity: 0; }
+        10%  { opacity: 1; }
+        90%  { opacity: 0.7; }
+        100% { transform: translateY(-120px) scale(1); opacity: 0; }
+    }
+    @keyframes bubblePulse {
+        0%,100% { box-shadow: inset 0 0 8px rgba(59,130,246,0.4), 0 0 10px rgba(59,130,246,0.3); }
+        50%     { box-shadow: inset 0 0 14px rgba(99,102,241,0.6), 0 0 20px rgba(99,102,241,0.4); }
+    }
+
+    /* ─── CANVAS (hidden, no longer used) ─── */
+    #cnv { display: none; }
+
+    /* ─── NAV ─── */
+    nav {
+        position: fixed; top:0; left:0; right:0; z-index:100;
+        padding: 1rem 5%;
+        display: flex; align-items:center; justify-content:space-between;
+        background: rgba(7,9,15,0.6);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(99,102,241,0.12);
+        transition: background 0.3s, padding 0.3s;
+    }
+    nav.scrolled { padding:.65rem 5%; background:rgba(7,9,15,0.92); }
+
+    .logo {
+        font-family:'Space Grotesk',sans-serif;
+        font-weight:700; font-size:1.45rem;
+        text-decoration:none; letter-spacing:-0.02em;
+    }
+
+    /* ─── LOGO SHINE ANIMATION ─── */
+    @keyframes logoShine {
+        0%   { background-position: -200% center; }
+        100% { background-position: 200% center; }
+    }
+    .logo-text {
+        font-family:'Space Grotesk',sans-serif;
+        font-weight:700; font-size:1.35rem;
+        background: linear-gradient(
+            90deg,
+            #f59e0b 0%,
+            #ffffff 20%,
+            #f59e0b 40%,
+            #ffffff 60%,
+            #f59e0b 80%,
+            #ffffff 100%
+        );
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: logoShine 2.5s linear infinite;
+        display: inline-block;
+    }
+
+    .nav-links { display:flex; gap:2rem; list-style:none; }
+    .nav-links a {
+        color:#94a3b8; text-decoration:none; font-size:.9rem; font-weight:500;
+        transition:color .2s;
+    }
+    .nav-links a:hover { color:#e2e8f0; }
+
+    .nav-cta {
+        background: linear-gradient(135deg, var(--indigo), var(--violet));
+        padding:.55rem 1.4rem; border-radius:40px; color:#fff !important;
+        font-weight:600; font-size:.85rem;
+        box-shadow: 0 0 20px rgba(99,102,241,0.35);
+        transition: opacity .2s, box-shadow .2s;
+    }
+    .nav-cta:hover { opacity:.88; box-shadow:0 0 30px rgba(99,102,241,0.55); }
+
+    .hamburger { display:none; background:none; border:none; color:#e2e8f0; font-size:1.4rem; cursor:pointer; }
+
+    /* ─── HERO ─── */
+    .hero {
+        position:relative; z-index:1;
+        min-height:100vh;
+        display:flex; align-items:center; justify-content:space-between;
+        gap:3rem; flex-wrap:wrap;
+        padding: 130px 5% 80px;
+        max-width:1280px; margin:0 auto;
+    }
+
+    .hero-badge {
+        display:inline-flex; align-items:center; gap:8px;
+        background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.3);
+        color:var(--indigo); padding:6px 14px; border-radius:30px;
+        font-size:.78rem; font-weight:600; margin-bottom:1.5rem;
+        letter-spacing:.04em;
+    }
+    .hero-badge .dot { width:7px; height:7px; background:#22c55e; border-radius:50%; animation:blink 1.4s ease-in-out infinite; }
+    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:.2;} }
+
+    /* Logo icon above hero title — subtle pulse glow, no solid border */
+    .hero-logo-icon {
+        width:48px; height:48px;
+        background:linear-gradient(145deg,#0c1520,#070d16);
+        border-radius:12px;
+        display:flex; align-items:center; justify-content:center;
+        border: none;
+        box-shadow: 0 0 18px rgba(59,130,246,0.35),
+                    0 0 6px  rgba(59,130,246,0.2);
+        animation: logoPulse 2.2s ease-in-out infinite;
+    }
+    @keyframes logoPulse {
+        0%,100% {
+            box-shadow: 0 0 14px rgba(59,130,246,0.3),
+                        0 0 5px  rgba(59,130,246,0.15);
+        }
+        50% {
+            box-shadow: 0 0 32px rgba(59,130,246,0.65),
+                        0 0 12px rgba(99,102,241,0.45);
+        }
+    }
+
+    .hero-title {
+        font-family:'Space Grotesk',sans-serif;
+        font-size: clamp(2.2rem, 6vw, 3.8rem);
+        font-weight:700; line-height:1.15; margin-bottom:1.2rem;
+        letter-spacing:-0.03em;
+    }
+    .hero-title .accent-indigo { color:var(--indigo); }
+    .hero-title .accent-gold   { color:var(--gold); }
+    .hero-title .accent-cyan   { color:var(--cyan); }
+
+    .hero-sub {
+        color:#94a3b8; font-size:1.05rem; line-height:1.7; margin-bottom:2rem;
+        max-width:480px;
+    }
+
+    .stats-row {
+        display:flex; gap:2.4rem; margin-bottom:2.2rem; flex-wrap:wrap;
+    }
+    .stat { }
+    .stat-val {
+        font-family:'Space Grotesk',sans-serif;
+        font-size:1.9rem; font-weight:700;
+        background:linear-gradient(135deg,#6366f1,#06b6d4);
+        -webkit-background-clip:text; background-clip:text; color:transparent;
+    }
+    .stat-lbl { font-size:.75rem; color:var(--muted); font-weight:500; margin-top:2px; }
+
+    .hero-btns { display:flex; gap:1rem; flex-wrap:wrap; }
+
+    .btn-primary {
+        display:inline-flex; align-items:center; gap:8px;
+        background:linear-gradient(135deg,var(--indigo),var(--violet));
+        color:#fff; padding:.85rem 2rem; border-radius:50px;
+        font-weight:700; font-size:.95rem; text-decoration:none;
+        box-shadow:0 4px 20px rgba(99,102,241,0.5), 0 0 0 1px rgba(99,102,241,0.3);
+        transition:transform .2s,box-shadow .2s;
+        position:relative; overflow:hidden;
+    }
+    .btn-primary::before {
+        content:'';
+        position:absolute;
+        top:0; left:-75%;
+        width:50%; height:100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+        transform: skewX(-20deg);
+        animation: btnShine 3s ease-in-out infinite;
+    }
+    @keyframes btnShine {
+        0%   { left: -75%; }
+        50%,100% { left: 125%; }
+    }
+    .btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(99,102,241,0.7), 0 0 0 1px rgba(99,102,241,0.5), 0 0 40px rgba(99,102,241,0.3); }
+
+    .btn-ghost {
+        display:inline-flex; align-items:center; gap:8px;
+        border:1px solid rgba(99,102,241,0.35); color:#e2e8f0;
+        padding:.85rem 2rem; border-radius:40px;
+        font-weight:600; font-size:.95rem; text-decoration:none;
+        transition:background .2s,border-color .2s;
+    }
+    .btn-ghost:hover { background:rgba(99,102,241,0.1); border-color:var(--indigo); }
+
+    /* hero card */
+    .hero-card {
+        background: linear-gradient(145deg,#111827,#0d1120);
+        border:1px solid rgba(99,102,241,0.2);
+        border-radius:24px; padding:24px;
+        min-width:270px; max-width:330px;
+        box-shadow:0 0 60px rgba(99,102,241,0.12), 0 20px 40px rgba(0,0,0,0.5);
+        position:relative;
+    }
+    .hcard-label { font-size:.7rem; font-weight:600; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; margin-bottom:.4rem; }
+    .hcard-val   { font-family:'Space Grotesk',sans-serif; font-size:2.4rem; font-weight:700; color:#e2e8f0; }
+    .hcard-sub   { font-size:.75rem; color:#22c55e; margin-top:.2rem; }
+
+    .hcard-bar-wrap { background:#1e293b; border-radius:20px; height:6px; margin:16px 0 8px; overflow:hidden; }
+    .hcard-bar { height:100%; border-radius:20px; background:linear-gradient(90deg,var(--indigo),var(--cyan)); animation:barAnim 3s ease-in-out infinite; }
+    @keyframes barAnim { 0%,100%{width:68%;} 50%{width:82%;} }
+
+    .hcard-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:16px; }
+    .hcard-cell {
+        background:#0f172a; border-radius:12px; padding:10px 8px; text-align:center;
+        border:1px solid rgba(99,102,241,0.1);
+    }
+    .hcard-cell strong { display:block; font-family:'Space Grotesk',sans-serif; font-size:1.1rem; font-weight:700; color:var(--indigo); }
+    .hcard-cell span   { font-size:.65rem; color:var(--muted); margin-top:2px; display:block; }
+
+    .hcard-chip {
+        position:absolute; display:inline-flex; align-items:center; gap:6px;
+        background:#0f172a; border:1px solid rgba(99,102,241,0.25);
+        color:#e2e8f0; font-size:.7rem; font-weight:600;
+        padding:5px 12px; border-radius:20px;
+        box-shadow:0 4px 20px rgba(0,0,0,0.4);
+    }
+    .hcard-chip.top    { top:-14px; right:18px; }
+    .hcard-chip.bottom { bottom:-14px; left:18px; }
+    .hcard-chip i      { color:var(--gold); }
+
+    /* ─── SECTIONS ─── */
+    section { position:relative; z-index:1; }
+
+    .section-wrap { max-width:1200px; margin:0 auto; padding:80px 5%; }
+
+    .eyebrow {
+        display:inline-block;
+        font-size:.7rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+        color:var(--indigo); margin-bottom:1rem;
+    }
+
+    .sec-title {
+        font-family:'Space Grotesk',sans-serif;
+        font-size: clamp(1.8rem,4vw,2.8rem);
+        font-weight:700; line-height:1.2;
+        letter-spacing:-0.02em; margin-bottom:1rem;
+    }
+    .sec-title span { color:var(--indigo); }
+
+    /* divider */
+    .divider {
+        width:100%; height:1px;
+        background:linear-gradient(90deg,transparent,rgba(99,102,241,0.3),transparent);
+        margin: 0 auto;
+    }
+
+    /* ─── FEATURES ─── */
+    .feat-grid {
+        display:grid;
+        grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+        gap:16px; margin-top:3rem;
+    }
+    .feat-card {
+        background:var(--card);
+        border:1px solid var(--border);
+        border-radius:20px; padding:28px;
+        transition:transform .3s, box-shadow .3s, border-color .3s;
+    }
+    .feat-card:hover {
+        transform:translateY(-6px);
+        box-shadow:0 16px 48px rgba(99,102,241,0.15);
+        border-color:rgba(99,102,241,0.4);
+    }
+    .feat-icon {
+        width:50px; height:50px; border-radius:14px;
+        display:flex; align-items:center; justify-content:center;
+        font-size:1.3rem; margin-bottom:1.1rem;
+        background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(139,92,246,0.15));
+        color:var(--indigo);
+    }
+    .feat-card h3 { font-family:'Space Grotesk',sans-serif; font-size:1.05rem; font-weight:700; margin-bottom:.5rem; }
+    .feat-card p  { color:#94a3b8; font-size:.88rem; line-height:1.65; }
+
+    /* ─── STEPS ─── */
+    .steps-bg { background:#0b0e1a; }
+    .steps-grid {
+        display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+        gap:16px; margin-top:3rem; position:relative;
+    }
+    .step-card {
+        background:var(--card); border:1px solid var(--border);
+        border-radius:20px; padding:28px 24px; text-align:center;
+        position:relative;
+    }
+    .step-num {
+        font-family:'Space Grotesk',sans-serif;
+        font-size:2.4rem; font-weight:700;
+        color:rgba(99,102,241,0.12); line-height:1;
+        margin-bottom:12px;
+    }
+    .step-icon-wrap {
+        width:56px; height:56px; border-radius:16px; margin:0 auto 16px;
+        display:flex; align-items:center; justify-content:center;
+        background:linear-gradient(135deg,var(--indigo),var(--violet));
+        font-size:1.3rem; color:#fff;
+        box-shadow:0 8px 24px rgba(99,102,241,0.35);
+    }
+    .step-card h3 { font-family:'Space Grotesk',sans-serif; font-size:1rem; font-weight:700; margin-bottom:.4rem; }
+    .step-card p  { color:#64748b; font-size:.83rem; }
+
+    /* ─── PRICING ─── */
+    .pricing-card-wrap { display:flex; justify-content:center; margin-top:3rem; }
+    .pricing-card {
+        background: linear-gradient(145deg,#111827,#0d1120);
+        border:1px solid rgba(99,102,241,0.3);
+        border-radius:28px; padding:40px 36px;
+        max-width:420px; width:100%;
+        box-shadow:0 0 80px rgba(99,102,241,0.12);
+        position:relative; overflow:hidden;
+        text-align:center;
+    }
+    .pricing-card::before {
+        content:''; position:absolute; top:0; left:50%; transform:translateX(-50%);
+        width:200px; height:2px;
+        background:linear-gradient(90deg,transparent,var(--indigo),transparent);
+    }
+    .price-badge {
+        display:inline-block; background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.3);
+        color:var(--gold); padding:4px 14px; border-radius:20px;
+        font-size:.75rem; font-weight:700; letter-spacing:.06em; margin-bottom:1.2rem;
+    }
+    .pricing-card h3 { font-family:'Space Grotesk',sans-serif; font-size:1.6rem; font-weight:700; margin-bottom:.3rem; }
+    .pricing-card .price-line { color:#94a3b8; font-size:.9rem; margin-bottom:1.8rem; }
+    .price-amount {
+        font-family:'Space Grotesk',sans-serif;
+        font-size:3.2rem; font-weight:700;
+        background:linear-gradient(135deg,var(--indigo),var(--cyan));
+        -webkit-background-clip:text; background-clip:text; color:transparent;
+    }
+    .price-amount small { font-size:1rem; color:#64748b; }
+    .feat-list { list-style:none; text-align:left; margin:2rem 0 2rem; }
+    .feat-list li {
+        display:flex; align-items:center; gap:10px;
+        padding:10px 0; border-bottom:1px solid rgba(99,102,241,0.08);
+        color:#cbd5e1; font-size:.92rem;
+    }
+    .feat-list li i { color:var(--indigo); font-size:.85rem; }
+
+    /* ─── TESTIMONIALS ─── */
+    .test-grid {
+        display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+        gap:16px; margin-top:3rem;
+    }
+    .test-card {
+        background:var(--card); border:1px solid var(--border);
+        border-radius:20px; padding:28px;
+        transition:transform .3s,box-shadow .3s;
+    }
+    .test-card:hover { transform:translateY(-4px); box-shadow:0 12px 32px rgba(0,0,0,0.3); }
+    .stars { color:var(--gold); font-size:1rem; margin-bottom:1rem; letter-spacing:2px; }
+    .test-card p { color:#94a3b8; font-size:.9rem; line-height:1.7; margin-bottom:1.2rem; font-style:italic; }
+    .test-author { display:flex; align-items:center; gap:12px; }
+    .test-avatar {
+        width:42px; height:42px; border-radius:12px;
+        display:flex; align-items:center; justify-content:center;
+        font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:.85rem;
+        color:#fff;
+    }
+    .test-author strong { display:block; font-size:.9rem; color:#e2e8f0; }
+    .test-author span   { font-size:.75rem; color:#64748b; }
+
+    /* ─── CTA ─── */
+    .cta-section { padding:80px 5%; text-align:center; }
+    .cta-inner {
+        max-width:680px; margin:0 auto;
+        background:linear-gradient(145deg,#111827,#0d1120);
+        border:1px solid rgba(99,102,241,0.25);
+        border-radius:28px; padding:60px 40px;
+        position:relative; overflow:hidden;
+    }
+    .cta-inner::before {
+        content:''; position:absolute; inset:0;
+        background:radial-gradient(ellipse at 50% 0%,rgba(99,102,241,0.12),transparent 70%);
+        pointer-events:none;
+    }
+    .cta-inner h2 { font-family:'Space Grotesk',sans-serif; font-size:clamp(1.8rem,4vw,2.4rem); font-weight:700; margin-bottom:1rem; }
+    .cta-inner p  { color:#94a3b8; margin-bottom:2rem; font-size:1rem; }
+
+    /* ─── FOOTER ─── */
+    footer {
+        background:#050709;
+        border-top:1px solid rgba(99,102,241,0.1);
+        padding:50px 5% 28px;
+    }
+    .footer-grid {
+        display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+        gap:2rem; max-width:1100px; margin:0 auto 3rem;
+    }
+    .footer-col a { display:block; color:#64748b; text-decoration:none; margin:.5rem 0; font-size:.88rem; transition:color .2s; }
+    .footer-col a:hover { color:var(--indigo); }
+    .footer-col h4 { color:#cbd5e1; font-size:.85rem; font-weight:600; margin-bottom:.8rem; letter-spacing:.04em; }
+    .copyright { text-align:center; color:#334155; font-size:.78rem; padding-top:1.5rem; border-top:1px solid rgba(255,255,255,0.04); }
+
+    /* ─── SCROLL REVEAL ─── */
+    .reveal {
+        opacity:0; transform:translateY(36px);
+        transition: opacity .65s cubic-bezier(.22,1,.36,1), transform .65s cubic-bezier(.22,1,.36,1);
+    }
+    .reveal.visible { opacity:1; transform:translateY(0); }
+    .reveal-delay-1 { transition-delay:.1s; }
+    .reveal-delay-2 { transition-delay:.2s; }
+    .reveal-delay-3 { transition-delay:.3s; }
+    .reveal-delay-4 { transition-delay:.4s; }
+    .reveal-delay-5 { transition-delay:.5s; }
+    .reveal-delay-6 { transition-delay:.6s; }
+
+    /* ─── MOBILE ─── */
+    @media(max-width:768px){
+        .nav-links { display:none; }
+        .hamburger { display:block; }
+        .nav-links.open {
+            display:flex; flex-direction:column; gap:1rem;
+            position:fixed; top:60px; left:0; right:0;
+            background:rgba(7,9,15,0.97); padding:1.5rem 5%;
+            border-bottom:1px solid rgba(99,102,241,0.15);
+        }
+        .hero { flex-direction:column; text-align:center; padding-top:110px; padding-bottom:50px; }
+        .hero-sub { margin:0 auto 2rem; }
+        .stats-row { justify-content:center; }
+        .hero-btns { justify-content:center; }
+        .hero-card { max-width:100%; }
+        .hcard-chip { display:none; }
+        .step-card { padding:22px 18px; }
+        .pricing-card { padding:32px 24px; }
+        .cta-inner { padding:40px 24px; }
+    }
+
+    @media(prefers-reduced-motion:reduce){
+        .reveal { opacity:1; transform:none; transition:none; }
+        .bubble,.hcard-bar,.logo-text { animation:none; }
+        .logo-text { background: linear-gradient(90deg,#f59e0b,#fff); -webkit-background-clip:text; background-clip:text; }
+    }
     </style>
 </head>
 <body>
 
+<!-- ── Floating Bubbles Background ── -->
+<div class="bubbles-bg" id="bubblesContainer"></div>
+<canvas id="cnv"></canvas>
+
 <!-- ── NAV ── -->
 <nav id="nav">
     <a href="/" class="logo" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
-        <!-- /api/logo এর জায়গায় ডিরেক্ট ইমেজ লিংক দিন -->
-        <img src="https://i.ibb.co/vz3Z4Z8/logo.png" alt="FF Glory" style="width:38px;height:38px;border-radius:9px;object-fit:cover;background:#000;">
+        <img src="/api/logo" alt="FF Glory" style="width:38px;height:38px;border-radius:9px;object-fit:cover;background:#000;">
         <span class="logo-text">FF GLORY</span>
     </a>
     <ul class="nav-links" id="navLinks">
@@ -26,8 +492,7 @@
         <li><a href="#steps">Process</a></li>
         <li><a href="#pricing">Plans</a></li>
         <li><a href="#reviews">Reviews</a></li>
-        <!-- /login থেকে পরিবর্তন করে user/login.html করা হলো -->
-        <li><a href="user/login.html" class="nav-cta">Dashboard →</a></li>
+        <li><a href="/login" class="nav-cta">Dashboard →</a></li>
     </ul>
     <button class="hamburger" id="ham" aria-label="Menu"><i class="fas fa-bars"></i></button>
 </nav>
@@ -37,9 +502,11 @@
 <div class="hero">
     <div class="hero-left">
         <div class="hero-badge"><span class="dot"></span> Live System — 24/7 Running</div>
+        <!-- Centered logo icon above FF GLORY title -->
         <div style="display:flex;justify-content:center;margin:1.2rem 0 1rem;">
             <div class="hero-logo-icon">
-                <img src="https://i.ibb.co/vz3Z4Z8/logo.png" alt="FF Glory" style="width:48px;height:48px;object-fit:cover;border-radius:12px;">
+                <img src="/api/logo" alt="FF Glory"
+                     style="width:48px;height:48px;object-fit:cover;border-radius:12px;">
             </div>
         </div>
         <h1 class="hero-title">
@@ -50,12 +517,25 @@
         </h1>
         <p class="hero-sub">Automatically boost your clan's glory every day. No manual work — set it up once and watch your rank climb.</p>
         <div class="hero-btns">
-            <!-- Get Started বাটনে ক্লিক করলে Login পেজে যাবে -->
-            <a href="user/login.html" class="btn-primary"><i class="fas fa-bolt"></i> Get Started</a>
+            <a href="/login" class="btn-primary"><i class="fas fa-bolt"></i> Get Started</a>
             <a href="#steps" class="btn-ghost"><i class="fas fa-play-circle"></i> How it works</a>
         </div>
-        <!-- ... বাকি স্ট্যাটস এবং hero-card কোড একই থাকবে ... -->
+        <div class="stats-row" style="margin-top:2rem;">
+            <div class="stat">
+                <div class="stat-val">35M+</div>
+                <div class="stat-lbl">Daily Glory</div>
+            </div>
+            <div class="stat">
+                <div class="stat-val">99.9%</div>
+                <div class="stat-lbl">Uptime</div>
+            </div>
+            <div class="stat">
+                <div class="stat-val">200+</div>
+                <div class="stat-lbl">Active Clans</div>
+            </div>
+        </div>
     </div>
+
     <div class="hero-card" style="flex-shrink:0;">
         <div class="hcard-chip top"><i class="fas fa-bolt"></i> +250k/hr</div>
         <div class="hcard-label">Today's Glory Earned</div>
@@ -75,10 +555,270 @@
 </div>
 </section>
 
-<!-- এখানে আপনার Features, Steps, Pricing, Reviews, CTA এবং Footer এর কোডগুলো হুবহু বসিয়ে দিন -->
+<div class="divider"></div>
+
+<!-- ── FEATURES ── -->
+<section id="features">
+<div class="section-wrap">
+    <div class="reveal">
+        <span class="eyebrow">Why Us</span>
+        <h2 class="sec-title">Built for <span>Serious Clans</span></h2>
+    </div>
+    <div class="feat-grid">
+        <div class="feat-card reveal reveal-delay-1">
+            <div class="feat-icon"><i class="fas fa-microchip"></i></div>
+            <h3>Smart Bot Engine</h3>
+            <p>Fully automated glory farming with intelligent daily scheduling across all servers.</p>
+        </div>
+        <div class="feat-card reveal reveal-delay-2">
+            <div class="feat-icon" style="background:linear-gradient(135deg,rgba(6,182,212,0.15),rgba(99,102,241,0.1));color:var(--cyan);"><i class="fas fa-chart-line"></i></div>
+            <h3>Live Dashboard</h3>
+            <p>Track every glory run, bot status, and clan progress in real time.</p>
+        </div>
+        <div class="feat-card reveal reveal-delay-3">
+            <div class="feat-icon" style="background:linear-gradient(135deg,rgba(245,158,11,0.12),rgba(239,68,68,0.08));color:var(--gold);"><i class="fas fa-globe"></i></div>
+            <h3>All Regions</h3>
+            <p>Supports India, ME, Bangladesh, SEA and more — auto-detected region codes.</p>
+        </div>
+        <div class="feat-card reveal reveal-delay-4">
+            <div class="feat-icon" style="background:linear-gradient(135deg,rgba(34,197,94,0.12),rgba(6,182,212,0.08));color:#22c55e;"><i class="fas fa-shield-alt"></i></div>
+            <h3>Fully Secure</h3>
+            <p>Encrypted sessions, no clan credentials stored — completely safe for your account.</p>
+        </div>
+        <div class="feat-card reveal reveal-delay-5">
+            <div class="feat-icon" style="background:linear-gradient(135deg,rgba(139,92,246,0.15),rgba(99,102,241,0.1));color:var(--violet);"><i class="fas fa-ticket-alt"></i></div>
+            <h3>Coupon System</h3>
+            <p>Discount coupons, referral credits — rewards for loyal users built right in.</p>
+        </div>
+        <div class="feat-card reveal reveal-delay-6">
+            <div class="feat-icon" style="background:linear-gradient(135deg,rgba(245,158,11,0.15),rgba(239,68,68,0.08));color:var(--gold);"><i class="fas fa-headset"></i></div>
+            <h3>Fast Support</h3>
+            <p>Admin responds in under 12 hours. Auto refund triggered on failed runs.</p>
+        </div>
+    </div>
+</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── STEPS ── -->
+<section id="steps" class="steps-bg">
+<div class="section-wrap">
+    <div class="reveal" style="text-align:center;">
+        <span class="eyebrow">Simple Process</span>
+        <h2 class="sec-title">Up & Running in <span>4 Steps</span></h2>
+    </div>
+    <div class="steps-grid">
+        <div class="step-card reveal reveal-delay-1">
+            <div class="step-num">01</div>
+            <div class="step-icon-wrap"><i class="fas fa-user-plus"></i></div>
+            <h3>Create Account</h3>
+            <p>Free sign-up. No credit card required.</p>
+        </div>
+        <div class="step-card reveal reveal-delay-2">
+            <div class="step-num">02</div>
+            <div class="step-icon-wrap" style="background:linear-gradient(135deg,var(--gold),#d97706);"><i class="fas fa-coins"></i></div>
+            <h3>Add Credits</h3>
+            <p>Pay via UPI or Binance. Instant activation.</p>
+        </div>
+        <div class="step-card reveal reveal-delay-3">
+            <div class="step-num">03</div>
+            <div class="step-icon-wrap" style="background:linear-gradient(135deg,var(--cyan),#0891b2);"><i class="fas fa-gamepad"></i></div>
+            <h3>Enter Clan ID</h3>
+            <p>Paste your Free Fire clan group ID.</p>
+        </div>
+        <div class="step-card reveal reveal-delay-4">
+            <div class="step-num">04</div>
+            <div class="step-icon-wrap" style="background:linear-gradient(135deg,#22c55e,#16a34a);"><i class="fas fa-chart-simple"></i></div>
+            <h3>Auto Glory</h3>
+            <p>Sit back. Watch your ranking rise.</p>
+        </div>
+    </div>
+</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── PRICING ── -->
+<section id="pricing">
+<div class="section-wrap">
+    <div class="reveal" style="text-align:center;">
+        <span class="eyebrow">Pricing</span>
+        <h2 class="sec-title">Transparent <span>Plans</span></h2>
+    </div>
+    <div class="pricing-card-wrap reveal reveal-delay-2">
+        <div class="pricing-card">
+            <div class="price-badge">⭐ MOST POPULAR</div>
+            <h3>Pro Plan</h3>
+            <p class="price-line">Everything you need to dominate rankings</p>
+            <div class="price-amount">₹20 <small>/ credit</small></div>
+            <ul class="feat-list">
+                <li><i class="fas fa-check-circle"></i> 1 credit = 1 full glory session</li>
+                <li><i class="fas fa-check-circle"></i> Full dashboard & history access</li>
+                <li><i class="fas fa-check-circle"></i> All region support</li>
+                <li><i class="fas fa-check-circle"></i> Auto refund if run fails</li>
+                <li><i class="fas fa-check-circle"></i> Priority admin support</li>
+            </ul>
+            <a href="/login" class="btn-primary" style="display:flex;width:100%;justify-content:center;border-radius:50px;">
+                <i class="fas fa-crown"></i> Get Started
+            </a>
+        </div>
+    </div>
+</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── REVIEWS ── -->
+<section id="reviews">
+<div class="section-wrap">
+    <div class="reveal">
+        <span class="eyebrow">Testimonials</span>
+        <h2 class="sec-title">Trusted by <span>Clan Leaders</span></h2>
+    </div>
+    <div class="test-grid">
+        <div class="test-card reveal reveal-delay-1">
+            <div class="stars">★★★★★</div>
+            <p>"My clan jumped from rank 50 to top 5 in just 10 days. Absolutely insane tool."</p>
+            <div class="test-author">
+                <div class="test-avatar" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);">AK</div>
+                <div><strong>Ahmed K.</strong><span>Desert Clan, ME Server</span></div>
+            </div>
+        </div>
+        <div class="test-card reveal reveal-delay-2">
+            <div class="stars">★★★★★</div>
+            <p>"Support replied in under 2 hours. Refund was processed same day when the bot missed a run."</p>
+            <div class="test-author">
+                <div class="test-avatar" style="background:linear-gradient(135deg,#f59e0b,#d97706);">RJ</div>
+                <div><strong>Rajan</strong><span>Phoenix Squad, India</span></div>
+            </div>
+        </div>
+        <div class="test-card reveal reveal-delay-3">
+            <div class="stars">★★★★½</div>
+            <p>"Dashboard is clean and easy to use. Our whole squad uses it every season without fail."</p>
+            <div class="test-author">
+                <div class="test-avatar" style="background:linear-gradient(135deg,#06b6d4,#0891b2);">MH</div>
+                <div><strong>Mohamed H.</strong><span>Night Wolves, BD Server</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ── CTA ── -->
+<section class="cta-section">
+    <div class="cta-inner reveal">
+        <span class="eyebrow">Ready?</span>
+        <h2>Dominate the <span style="color:var(--indigo)">Leaderboard</span> Today</h2>
+        <p>Join 200+ clans already automating their glory with FF GLORY.</p>
+        <a href="/login" class="btn-primary" style="font-size:1rem;padding:.9rem 2.4rem;">
+            <i class="fas fa-crown"></i> Start For Free
+        </a>
+    </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+    <div class="footer-grid">
+        <div class="footer-col">
+            <a href="/" style="display:inline-flex;align-items:center;gap:9px;text-decoration:none;">
+            <img src="/api/logo" alt="FF Glory" style="width:28px;height:28px;border-radius:8px;object-fit:cover;background:#000;">
+            <span class="logo-text" style="font-size:1.2rem;">FF GLORY</span>
+        </a>
+            <p style="color:#334155;font-size:.82rem;margin-top:.8rem;line-height:1.6;">Advanced glory automation for serious Free Fire clans.</p>
+        </div>
+        <div class="footer-col">
+            <h4>Navigate</h4>
+            <a href="#features">Features</a>
+            <a href="#steps">Process</a>
+            <a href="#pricing">Pricing</a>
+        </div>
+        <div class="footer-col">
+            <h4>Support</h4>
+            <a href="#">Help Center</a>
+            <a href="#">Discord</a>
+            <a href="#">Telegram</a>
+        </div>
+        <div class="footer-col">
+            <h4>Legal</h4>
+            <a href="#">Terms</a>
+            <a href="#">Privacy</a>
+            <a href="#">Refund Policy</a>
+        </div>
+    </div>
+    <div class="copyright">© 2025 FF GLORY — Built for Free Fire players worldwide</div>
+</footer>
 
 <script>
-// আপনার আগের দেওয়া index.html এর জাভাস্ক্রিপ্ট কোড এখানে বসিয়ে দিন (Bubbles, Nav ইত্যাদি)
+// ── Floating Bubbles Background ──
+(function() {
+    const container = document.getElementById('bubblesContainer');
+    const bubbleCount = 28;
+    const colors = [
+        'rgba(37,99,235,0.55)',
+        'rgba(29,78,216,0.45)',
+        'rgba(59,130,246,0.50)',
+        'rgba(96,165,250,0.35)',
+        'rgba(99,102,241,0.40)',
+        'rgba(30,58,138,0.60)',
+        'rgba(191,219,254,0.20)',
+    ];
+
+    function createBubble() {
+        const b = document.createElement('div');
+        b.className = 'bubble';
+        const size = Math.random() * 60 + 10;
+        const left = Math.random() * 100;
+        const duration = Math.random() * 14 + 8;
+        const delay = Math.random() * 12;
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const isBig = size > 45;
+
+        b.style.cssText = `
+            width: ${size}px;
+            height: ${size}px;
+            left: ${left}%;
+            bottom: -80px;
+            background: radial-gradient(circle at 35% 35%, ${color.replace(')', ', 0.8)').replace('rgba', 'rgba')}, transparent 70%);
+            border: 1px solid ${color};
+            box-shadow: inset 0 0 ${isBig?12:6}px ${color}, 0 0 ${isBig?18:8}px ${color};
+            animation: floatUp ${duration}s ${delay}s linear infinite;
+        `;
+        container.appendChild(b);
+    }
+
+    for (let i = 0; i < bubbleCount; i++) {
+        createBubble();
+    }
+})();
+
+// ── Nav ──
+window.addEventListener('scroll',()=>{
+    document.getElementById('nav').classList.toggle('scrolled',scrollY>60);
+});
+
+// ── Hamburger ──
+document.getElementById('ham').addEventListener('click',()=>{
+    document.getElementById('navLinks').classList.toggle('open');
+});
+
+// ── Scroll reveal (IntersectionObserver) ──
+const observer = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+        if(e.isIntersecting){ e.target.classList.add('visible'); observer.unobserve(e.target); }
+    });
+},{threshold:0.12});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+// ── Smooth scroll ──
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+    a.addEventListener('click',e=>{
+        const t=document.querySelector(a.getAttribute('href'));
+        if(t){ e.preventDefault(); t.scrollIntoView({behavior:'smooth'}); }
+    });
+});
 </script>
 </body>
 </html>
