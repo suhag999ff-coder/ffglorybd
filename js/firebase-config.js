@@ -1,4 +1,4 @@
-// Firebase SDK v8 (Compat) via CDN
+// js/firebase-config.js
 const firebaseConfig = {
   apiKey: "AIzaSyByLaoNEv-zVT32BvsrhTE2aTGi0P6mcuY",
   authDomain: "ff-glory-3fb9c.firebaseapp.com",
@@ -8,10 +8,6 @@ const firebaseConfig = {
   messagingSenderId: "1093224801355",
   appId: "1:1093224801355:web:8c641dd89a5bc4193799ce"
 };
-
-// Initialize Firebase
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
