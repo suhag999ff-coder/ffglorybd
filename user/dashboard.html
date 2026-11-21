@@ -12,7 +12,7 @@
     <!-- Top Navbar -->
     <div class="top-nav">
         <div class="logo-area">
-            <img src="https://i.ibb.co/vz3Z4Z8/logo.png" alt="Logo" id="site-logo">
+            <img src="https://i.ibb.co/vz3Z4Z8/logo.png" alt="Logo">
             <span class="logo-text">FF GLORY</span>
         </div>
         <button class="exit-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Exit</button>
@@ -25,15 +25,14 @@
         <div class="badge special"><i class="fas fa-crown"></i> Special: <span id="special-credit">0</span></div>
     </div>
 
-    <!-- Main Content Area -->
-    <div style="padding-bottom: 70px;">
-        
+    <!-- Main Content -->
+    <div style="padding-bottom: 80px;">
         <!-- HOME TAB -->
         <div id="tab-home" class="tab-content">
             <div class="card">
-                <h3 class="card-title" data-i18n="launchBot"><i class="fas fa-rocket" style="color:var(--blue)"></i> Launch New Bot</h3>
+                <h3 class="card-title"><i class="fas fa-rocket" style="color:var(--blue)"></i> Launch New Bot</h3>
                 <div class="input-group">
-                    <label data-i18n="selectRegion">Select Region</label>
+                    <label>Select Region</label>
                     <select id="region">
                         <option value="bd">Bangladesh</option>
                         <option value="ind">India</option>
@@ -41,48 +40,42 @@
                     </select>
                 </div>
                 <div class="input-group">
-                    <label data-i18n="clanId">Clan ID</label>
+                    <label>Clan ID</label>
                     <input type="text" placeholder="Enter your Clan ID">
                 </div>
-                <button class="btn btn-success" data-i18n="startBoosting"><i class="fas fa-play"></i> Start Boosting</button>
+                <button class="btn btn-success"><i class="fas fa-play"></i> Start Boosting</button>
             </div>
         </div>
 
-        <!-- COUPON TAB -->
-        <div id="tab-coupon" class="tab-content" style="display:none;">
-            <div class="card">
-                <h3 class="card-title" data-i18n="redeemCoupon"><i class="fas fa-gift" style="color:var(--gold)"></i> Redeem Coupon</h3>
-                <div class="input-group">
-                    <input type="text" id="coupon-code" placeholder="Enter coupon code">
-                </div>
-                <button class="btn btn-primary" onclick="redeemCoupon()">Redeem</button>
-            </div>
-        </div>
-
-        <!-- BUY TAB (Manual Payment) -->
+        <!-- BUY TAB -->
         <div id="tab-buy" class="tab-content" style="display:none;">
-            <h3 style="text-align:center; margin: 15px; font-family: Space Grotesk;" data-i18n="buyCredits">BUY CREDITS</h3>
-            
-            <!-- Basic Credit -->
+            <h3 style="text-align:center; margin: 15px; font-family: Space Grotesk;">BUY CREDITS</h3>
             <div class="card">
-                <h4 style="color: var(--blue); margin-bottom: 10px;"><i class="fas fa-gem"></i> Basic Credit (₹90)</h4>
+                <h4 style="color: var(--blue); margin-bottom: 10px;"><i class="fas fa-gem"></i> Basic Credit (৳90)</h4>
                 <div class="pay-method" onclick="showPayment('bkash', 90)">
-                    <div style="display:flex; align-items:center;">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/BKash_Logo.svg/1200px-BKash_Logo.svg.png">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/BKash_Logo.svg/1200px-BKash_Logo.svg.png" style="width:30px;">
                         <span>bKash</span>
                     </div>
                     <i class="fas fa-chevron-right"></i>
                 </div>
                 <div class="pay-method" onclick="showPayment('nagad', 90)">
-                    <div style="display:flex; align-items:center;">
-                        <img src="https://upload.wikimedia.org/wikipedia/en/thumb/8/8c/Nagad_logo.png/220px-Nagad_logo.png">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <img src="https://upload.wikimedia.org/wikipedia/en/thumb/8/8c/Nagad_logo.png/220px-Nagad_logo.png" style="width:30px;">
                         <span>Nagad</span>
                     </div>
                     <i class="fas fa-chevron-right"></i>
                 </div>
+                <div class="pay-method" onclick="showPayment('rocket', 90)">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <img src="https://upload.wikimedia.org/wikipedia/en/thumb/8/82/Dutch-Bangla_Rocket_Logo.svg/1200px-Dutch-Bangla_Rocket_Logo.svg.png" style="width:30px;">
+                        <span>Rocket</span>
+                    </div>
+                    <i class="fas fa-chevron-right"></i>
+                </div>
                 <div class="pay-method" onclick="showPayment('binance', 1)">
-                    <div style="display:flex; align-items:center;">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Binance_logo.svg/1200px-Binance_logo.svg.png">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Binance_logo.svg/1200px-Binance_logo.svg.png" style="width:30px;">
                         <span>Binance (USDT)</span>
                     </div>
                     <i class="fas fa-chevron-right"></i>
@@ -90,10 +83,21 @@
             </div>
         </div>
 
+        <!-- COUPON TAB -->
+        <div id="tab-coupon" class="tab-content" style="display:none;">
+            <div class="card">
+                <h3 class="card-title"><i class="fas fa-gift" style="color:var(--gold)"></i> Redeem Coupon</h3>
+                <div class="input-group">
+                    <input type="text" id="coupon-code" placeholder="Enter coupon code">
+                </div>
+                <button class="btn btn-primary">Redeem</button>
+            </div>
+        </div>
+
         <!-- HISTORY TAB -->
         <div id="tab-history" class="tab-content" style="display:none;">
             <div class="card">
-                <h3 class="card-title" data-i18n="history">Transaction History</h3>
+                <h3 class="card-title">Transaction History</h3>
                 <p style="color: var(--muted); text-align:center; padding: 20px;">No transactions yet.</p>
             </div>
         </div>
@@ -101,7 +105,7 @@
         <!-- CONTACT TAB -->
         <div id="tab-contact" class="tab-content" style="display:none;">
             <div class="card">
-                <h3 class="card-title" data-i18n="contact">Contact Us</h3>
+                <h3 class="card-title">Contact Us</h3>
                 <a href="https://t.me/narutocodexfc" class="pay-method" style="text-decoration:none; color:white;">
                     <div style="display:flex; align-items:center; gap:10px;">
                         <i class="fab fa-telegram" style="font-size:1.5rem; color: #0088cc;"></i>
@@ -111,55 +115,43 @@
                 </a>
             </div>
         </div>
-
     </div>
 
-    <!-- Payment Modal (Hidden by default) -->
+    <!-- Payment Modal -->
     <div id="paymentModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.8); z-index:1000; align-items:center; justify-content:center; padding:20px;">
         <div class="card" style="width:100%; max-width:400px;">
             <h3 style="margin-bottom:15px; color:var(--blue);" id="modalTitle">Payment</h3>
             <p style="font-size:0.85rem; margin-bottom:15px; color:var(--muted);">
                 Send <span id="modalAmount" style="color:white; font-weight:bold;"></span> to:<br>
-                bKash/Nagad: <b>017XXXXXXXX</b> (Personal)<br>
+                bKash/Nagad/Rocket: <b>017XXXXXXXX</b> (Personal)<br>
                 Binance ID: <b>123456789</b>
             </p>
             <div class="input-group">
-                <label data-i18n="senderNumber">Sender Number / Binance ID</label>
+                <label>Sender Number / Binance ID</label>
                 <input type="text" id="senderNumber" placeholder="01XXXXXXXXX">
             </div>
             <div class="input-group">
-                <label data-i18n="trxId">Transaction ID (TrxID)</label>
+                <label>Transaction ID (TrxID)</label>
                 <input type="text" id="trxId" placeholder="TrxID">
             </div>
-            <button class="btn btn-primary" onclick="submitPayment()" data-i18n="submit">Submit</button>
+            <button class="btn btn-primary" onclick="submitPayment()">Submit</button>
             <button class="btn" style="background:transparent; color:red; margin-top:10px;" onclick="closeModal()">Cancel</button>
         </div>
     </div>
 
     <!-- Bottom Navigation -->
     <div class="bottom-nav">
-        <a href="#" class="nav-item active" onclick="switchTab('home', this)"><i class="fas fa-home"></i><span data-i18n="home">Home</span></a>
-        <a href="#" class="nav-item" onclick="switchTab('buy', this)"><i class="fas fa-thumbs-up"></i><span data-i18n="buy">Buy</span></a>
-        <a href="#" class="nav-item" onclick="switchTab('coupon', this)"><i class="fas fa-ticket-alt"></i><span data-i18n="coupon">Coupon</span></a>
-        <a href="#" class="nav-item" onclick="switchTab('history', this)"><i class="fas fa-history"></i><span data-i18n="history">History</span></a>
-        <a href="#" class="nav-item" onclick="switchTab('contact', this)"><i class="fas fa-headset"></i><span data-i18n="contact">Contact</span></a>
-    </div>
-
-    <!-- Language Selector (Bottom Right) -->
-    <div style="position:fixed; top:60px; right:15px; z-index:99;">
-        <select onchange="changeLanguage(this.value)" style="padding:5px; border-radius:5px; background:#0f172a; color:white; border:1px solid var(--border);">
-            <option value="en">English</option>
-            <option value="bn">বাংলা</option>
-            <option value="hi">हिंदी</option>
-            <option value="ar">العربية</option>
-        </select>
+        <a href="#" class="nav-item active" onclick="switchTab('home', this)"><i class="fas fa-home"></i><span>Home</span></a>
+        <a href="#" class="nav-item" onclick="switchTab('buy', this)"><i class="fas fa-shopping-cart"></i><span>Buy</span></a>
+        <a href="#" class="nav-item" onclick="switchTab('coupon', this)"><i class="fas fa-ticket-alt"></i><span>Coupon</span></a>
+        <a href="#" class="nav-item" onclick="switchTab('history', this)"><i class="fas fa-history"></i><span>History</span></a>
+        <a href="#" class="nav-item" onclick="switchTab('contact', this)"><i class="fas fa-headset"></i><span>Contact</span></a>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="../js/firebase-config.js"></script>
-    <script src="../js/translations.js"></script>
     <script src="../js/user.js"></script>
 </body>
 </html>
