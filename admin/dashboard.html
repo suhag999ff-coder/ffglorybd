@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FF GLORY - Admin Dashboard</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .table-wrap { overflow-x: auto; margin-top: 15px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { color: var(--muted); }
+        .action-btn { padding: 5px 10px; border-radius: 5px; border: none; cursor: pointer; }
+        .btn-approve { background: var(--success); color: #fff; }
+        .btn-reject { background: red; color: #fff; }
+    </style>
+</head>
+<body>
+
+    <div class="top-nav">
+        <div class="logo-area">
+            <span class="logo-text" style="color: #fff;">ADMIN PANEL</span>
+        </div>
+        <button class="exit-btn" onclick="logoutAdmin()"><i class="fas fa-sign-out-alt"></i> Exit</button>
+    </div>
+
+    <div style="padding: 20px;">
+        <div class="card">
+            <h3 class="card-title">Pending Payments</h3>
+            <div class="table-wrap">
+                <table id="paymentsTable">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Method</th>
+                            <th>Amount</th>
+                            <th>TrxID</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be loaded by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 class="card-title">Global Settings</h3>
+            <div class="input-group">
+                <label>Logo Image URL</label>
+                <input type="text" id="logoUrl" placeholder="https://example.com/logo.png">
+                <button class="btn btn-primary" style="margin-top:10px;" onclick="updateLogo()">Update Logo</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/admin.js"></script>
+</body>
+</html>
