@@ -1,4 +1,4 @@
-// Tab Switching
+// js/user.js
 function switchTab(tabId, element) {
     document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
     document.getElementById('tab-' + tabId).style.display = 'block';
@@ -6,12 +6,9 @@ function switchTab(tabId, element) {
     element.classList.add('active');
 }
 
-// Auth & User Data Fetch
 auth.onAuthStateChanged(user => {
     if (user) {
         document.getElementById('user-name').innerText = user.email.split('@')[0];
-        
-        // Fetch credits from Database
         db.ref('users/' + user.uid).on('value', snapshot => {
             const data = snapshot.val();
             if (data) {
@@ -24,13 +21,8 @@ auth.onAuthStateChanged(user => {
     }
 });
 
-function logout() {
-    auth.signOut().then(() => {
-        window.location.href = 'login.html';
-    });
-}
+function logout() { auth.signOut().then(() => window.location.href = 'login.html'); }
 
-// Manual Payment Modal
 let currentMethod = '';
 let currentAmount = 0;
 
@@ -42,9 +34,7 @@ function showPayment(method, amount) {
     document.getElementById('modalAmount').innerText = method === 'binance' ? `$${amount}` : `৳${amount}`;
 }
 
-function closeModal() {
-    document.getElementById('paymentModal').style.display = 'none';
-}
+function closeModal() { document.getElementById('paymentModal').style.display = 'none'; }
 
 function submitPayment() {
     const sender = document.getElementById('senderNumber').value;
